@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Glean for NinjaOne</title>
+  <meta name="description" content="Executive overview of how Glean can deliver value to NinjaOne and the NinjaOne product team." />
+  <style>
+    :root {
+      --bg: #f5f7f8;
+      --surface: #ffffff;
+      --surface-soft: #f9fbfc;
+      --text: #16212b;
+      --muted: #5d6975;
+      --line: rgba(22, 33, 43, 0.10);
+      --line-strong: rgba(22, 33, 43, 0.16);
+      --brand: #00a0d2;
+      --brand-dark: #007da5;
+      --brand-soft: rgba(0, 160, 210, 0.10);
+      --success: #15825c;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 16px 36px rgba(0,0,0,0.06);
+      --radius: 22px;
+      --radius-sm: 14px;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(0, 160, 210, 0.10), transparent 26%),
+        radial-gradient(circle at top right, rgba(21, 130, 92, 0.05), transparent 20%),
+        var(--bg);
+      line-height: 1.55;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    .wrap {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(245, 247, 248, 0.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(22, 33, 43, 0.06);
+    }
+
+    .topbar-inner {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+      padding: 14px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--brand), #34b7e0);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 700;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
+      flex: 0 0 auto;
+    }
+
+    .brand-copy small {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 11px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .brand-copy strong {
+      display: block;
+      font-size: 15px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .nav a {
+      padding: 9px 12px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 13px;
+      transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+    }
+
+    .nav a:hover {
+      background: rgba(22, 33, 43, 0.05);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+
+    .hero {
+      padding: 56px 0 28px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .panel {
+      background: rgba(255,255,255,0.80);
+      border: 1px solid rgba(255,255,255,0.65);
+      border-radius: 30px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .hero-main {
+      padding: 40px;
+    }
+
+    .pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.84);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--brand);
+      box-shadow: 0 0 0 4px rgba(0, 160, 210, 0.12);
+    }
+
+    h1 {
+      margin: 0 0 14px;
+      font-size: clamp(36px, 5vw, 58px);
+      line-height: 1.02;
+      letter-spacing: -0.03em;
+      font-weight: 650;
+    }
+
+    .lead {
+      margin: 0;
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 13px 18px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: var(--brand);
+      color: white;
+      box-shadow: 0 10px 24px rgba(0, 160, 210, 0.18);
+    }
+
+    .btn-primary:hover { background: var(--brand-dark); }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.92);
+      color: var(--text);
+      border-color: var(--line);
+    }
+
+    .hero-side {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      justify-content: space-between;
+    }
+
+    .mini-card,
+    .stat,
+    .card,
+    .callout,
+    .tab-shell,
+    .acc-item {
+      background: rgba(255,255,255,0.88);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+
+    .mini-card { padding: 18px; }
+    .mini-card h3 { margin: 0 0 8px; font-size: 15px; }
+    .mini-card p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat { padding: 16px; border-radius: 18px; }
+    .stat small {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .stat strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 28px;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      font-weight: 650;
+    }
+
+    .stat p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    section { padding: 24px 0; }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: 31px;
+      line-height: 1.1;
+      letter-spacing: -0.025em;
+    }
+
+    .section-head p {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .grid-3,
+    .grid-4,
+    .split,
+    .flow {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .split { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .flow { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .card {
+      padding: 22px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow);
+      border-color: var(--line-strong);
+    }
+
+    .icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: var(--brand-soft);
+      color: var(--brand-dark);
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+
+    .card h3,
+    .card h4 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .card p,
+    .list {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .list {
+      padding-left: 18px;
+    }
+
+    .list li + li {
+      margin-top: 10px;
+    }
+
+    .tag {
+      display: inline-block;
+      margin-top: 14px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(21,130,92,0.10);
+      color: var(--success);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .tab-shell {
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,0.60);
+    }
+
+    .tab-btn {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 11px 14px;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .tab-btn:hover { background: rgba(22,33,43,0.05); color: var(--text); }
+    .tab-btn.active { background: var(--brand); color: white; }
+
+    .tab-panel {
+      display: none;
+      padding: 24px;
+    }
+
+    .tab-panel.active { display: block; }
+
+    .flow-step {
+      position: relative;
+      min-height: 142px;
+      padding: 18px;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+    }
+
+    .flow-step::after {
+      content: "→";
+      position: absolute;
+      top: 50%;
+      right: -10px;
+      transform: translateY(-50%);
+      color: rgba(22, 33, 43, 0.22);
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .flow-step:last-child::after { display: none; }
+
+    .flow-step small {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .flow-step h4 { margin: 0 0 8px; font-size: 16px; }
+    .flow-step p { margin: 0; font-size: 13px; color: var(--muted); }
+
+    .compare {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: white;
+    }
+
+    table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    th {
+      background: #fbfbfc;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    .good { color: var(--success); font-weight: 600; }
+
+    .callout {
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(0,160,210,0.10), rgba(0,160,210,0.04));
+      border-color: rgba(0, 160, 210, 0.18);
+    }
+
+    .callout strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 18px;
+      letter-spacing: -0.01em;
+    }
+
+    .callout p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .accordion {
+      display: grid;
+      gap: 12px;
+    }
+
+    .acc-item {
+      overflow: hidden;
+    }
+
+    .acc-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px;
+      background: transparent;
+      border: none;
+      font: inherit;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .acc-btn span:last-child {
+      color: var(--muted);
+      transition: transform 0.2s ease;
+      flex: 0 0 auto;
+    }
+
+    .acc-item.open .acc-btn span:last-child {
+      transform: rotate(45deg);
+    }
+
+    .acc-content {
+      display: none;
+      padding: 0 20px 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .acc-item.open .acc-content { display: block; }
+
+    .footer {
+      padding: 22px 0 48px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(14px);
+      animation: fadeUp 0.5s ease forwards;
+    }
+
+    .d1 { animation-delay: 0.05s; }
+    .d2 { animation-delay: 0.10s; }
+    .d3 { animation-delay: 0.15s; }
+    .d4 { animation-delay: 0.20s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .grid-3,
+      .grid-4,
+      .split,
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .flow-step::after { display: none; }
+    }
+
+    @media (max-width: 720px) {
+      .topbar-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .hero-main,
+      .hero-side { padding: 24px; }
+
+      h1 { font-size: 36px; }
+      .section-head h2 { font-size: 26px; }
+    }
+
+    @media print {
+      body {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+        background: white;
+      }
+
+      @page {
+        margin: 1in 0.75in;
+        size: letter;
+      }
+
+      section, .card, .panel, .tab-shell, .acc-item, .flow-step, .stat, .callout, table {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      h1, h2, h3, h4, .section-head {
+        break-after: avoid;
+        page-break-after: avoid;
+      }
+
+      p {
+        orphans: 3;
+        widows: 3;
+      }
+
+      .nav,
+      .hero-actions,
+      button {
+        display: none !important;
+      }
+
+      .tab-panel {
+        display: block !important;
+      }
+
+      .acc-content {
+        display: block !important;
+      }
+
+      .reveal {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+
+      .panel, .card, .tab-shell, .acc-item {
+        box-shadow: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-mark">G</div>
+        <div class="brand-copy">
+          <small>Executive briefing</small>
+          <strong>Glean for NinjaOne</strong>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Section navigation">
+        <a href="#overview">Overview</a>
+        <a href="#fit">Why it fits</a>
+        <a href="#product">Product team</a>
+        <a href="#models">Model strategy</a>
+        <a href="#build-buy">Build vs. buy</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-grid">
+        <div class="panel hero-main reveal">
+          <div class="pills">
+            <div class="pill"><span class="pill-dot"></span> Tailored for Peter Bretton</div>
+            <div class="pill">NinjaOne-inspired theme</div>
+            <div class="pill">Plain static HTML for Vercel</div>
+          </div>
+          <h1>Glean gives NinjaOne a governed AI layer for work.</h1>
+          <p class="lead">
+            Think of Glean as the internal counterpart to NinjaOne’s “single pane of glass” story: one permission-aware layer across company knowledge, people, and systems, so teams can move faster with AI without losing control.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#fit">See why it fits NinjaOne</a>
+            <a class="btn btn-secondary" href="#product">Jump to product-team use cases</a>
+          </div>
+        </div>
+
+        <aside class="panel hero-side reveal d1">
+          <div class="mini-card">
+            <h3>Core message</h3>
+            <p>Keep Anthropic and ChatGPT if they’re useful. Add Glean as the context, governance, and retrieval layer that makes enterprise AI trustworthy and scalable.</p>
+          </div>
+          <div class="stat-grid">
+            <div class="stat">
+              <small>What Glean is</small>
+              <strong>3-in-1</strong>
+              <p>Search, assistant, and agents on top of company knowledge</p>
+            </div>
+            <div class="stat">
+              <small>Why now</small>
+              <strong>1 layer</strong>
+              <p>Across docs, tickets, chat, code, CRM, and more</p>
+            </div>
+            <div class="stat">
+              <small>Best fit</small>
+              <strong>Product</strong>
+              <p>Feedback synthesis, roadmap context, and launch alignment</p>
+            </div>
+            <div class="stat">
+              <small>Differentiator</small>
+              <strong>Governed</strong>
+              <p>Permissions, auditability, and controlled scale</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="overview">
+      <div class="section-head reveal">
+        <div>
+          <h2>What Glean is</h2>
+          <p>A horizontal work AI platform that connects enterprise systems into one usable, permission-aware context layer.</p>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <article class="card reveal d1">
+          <div class="icon">⌕</div>
+          <h3>Enterprise search</h3>
+          <p>One search surface across docs, Slack, Jira, tickets, CRM, code, and internal tools so employees find what matters without hopping app to app.</p>
+          <span class="tag">Faster discovery</span>
+        </article>
+
+        <article class="card reveal d2">
+          <div class="icon">✦</div>
+          <h3>AI assistant</h3>
+          <p>Answers, summaries, briefs, and drafts grounded in the company’s actual knowledge and filtered by each user’s permissions.</p>
+          <span class="tag">Better decisions</span>
+        </article>
+
+        <article class="card reveal d3">
+          <div class="icon">↺</div>
+          <h3>Agent platform</h3>
+          <p>Reusable workflows and actions that operate on governed company context instead of brittle one-off prompts or isolated personal automations.</p>
+          <span class="tag">Controlled scale</span>
+        </article>
+      </div>
+    </section>
+
+    <section id="fit">
+      <div class="section-head reveal">
+        <div>
+          <h2>Why Glean fits NinjaOne</h2>
+          <p>NinjaOne already wins with a unified control-plane story for IT. Glean brings the same idea to internal knowledge and AI execution.</p>
+        </div>
+      </div>
+
+      <div class="grid-4">
+        <article class="card reveal d1">
+          <div class="icon">◫</div>
+          <h4>Matches the platform DNA</h4>
+          <p>NinjaOne positions itself as a unified control plane for IT operations. Glean becomes the unified control plane for internal work and AI.</p>
+        </article>
+
+        <article class="card reveal d2">
+          <div class="icon">⚙</div>
+          <h4>Supports product expansion</h4>
+          <p>As NinjaOne adds backup, ITAM, remote, MDM, AIOps, and automation, internal context gets harder to find and reuse without a shared knowledge layer.</p>
+        </article>
+
+        <article class="card reveal d3">
+          <div class="icon">⚑</div>
+          <h4>Improves BYOAI governance</h4>
+          <p>Instead of unmanaged point AI and ad hoc internal RAG projects, Glean gives teams one governed, permission-aware path to use AI safely.</p>
+        </article>
+
+        <article class="card reveal d4">
+          <div class="icon">⇄</div>
+          <h4>Speeds cross-functional execution</h4>
+          <p>Engineering, product, GTM, support, and security all work from the same context, so less time is lost to rediscovery, rework, and conflicting answers.</p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <div class="tab-shell reveal">
+        <div class="tabs" role="tablist" aria-label="Value tabs">
+          <button class="tab-btn active" data-tab="tab-1" role="tab" aria-selected="true">Across NinjaOne</button>
+          <button class="tab-btn" data-tab="tab-2" role="tab" aria-selected="false">For the product team</button>
+          <button class="tab-btn" data-tab="tab-3" role="tab" aria-selected="false">For leadership</button>
+        </div>
+
+        <div class="tab-panel active" id="tab-1">
+          <div class="split">
+            <div class="card">
+              <h3>Highest-level value</h3>
+              <ul class="list">
+                <li>Reduce internal knowledge sprawl across GitHub, Jira, Confluence, Google Workspace, Slack, ticketing, CRM, and other systems.</li>
+                <li>Give employees one trusted AI front door instead of scattered assistants with uneven quality and controls.</li>
+                <li>Let technical teams focus on customer-facing AI and product innovation, not internal search and retrieval plumbing.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Business outcomes</h3>
+              <ul class="list">
+                <li>Faster engineering ramp and less duplicate work</li>
+                <li>Stronger GTM prep and more consistent messaging</li>
+                <li>Better support resolution through faster access to precedent</li>
+                <li>Lower risk from overshared or poorly governed internal content</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="tab-2">
+          <div class="grid-3">
+            <article class="card">
+              <div class="icon">①</div>
+              <h3>Aggregate product signal</h3>
+              <p>Pull feature requests, support escalations, competitive notes, sales feedback, and internal discussion into one synthesized view of what matters most.</p>
+            </article>
+            <article class="card">
+              <div class="icon">②</div>
+              <h3>Accelerate planning</h3>
+              <p>Turn prior docs, Jira history, Slack threads, and customer feedback into first drafts of PRDs, roadmap briefs, launch narratives, and decision memos.</p>
+            </article>
+            <article class="card">
+              <div class="icon">③</div>
+              <h3>Preserve decision context</h3>
+              <p>Answer questions like “What did we decide last time?” or “Why did this roadmap choice happen?” without relying on tribal knowledge or the right person being online.</p>
+            </article>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="tab-3">
+          <div class="split">
+            <div class="card">
+              <h3>What leadership gets</h3>
+              <ul class="list">
+                <li>Faster strategic briefs across product, support, sales, and AI initiatives</li>
+                <li>Better visibility into recurring issues, feedback trends, and execution risk</li>
+                <li>A cleaner path to scaling AI without creating governance debt</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>What changes operationally</h3>
+              <ul class="list">
+                <li>More reuse of prior work</li>
+                <li>Less time spent asking around for context</li>
+                <li>Higher confidence that AI outputs are grounded in the right internal sources</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="product">
+      <div class="section-head reveal">
+        <div>
+          <h2>A practical view for the NinjaOne product team</h2>
+          <p>Three high-value workflows Peter and the product strategy org could immediately map to real work.</p>
+        </div>
+      </div>
+
+      <div class="flow reveal d1">
+        <div class="flow-step">
+          <small>Use case 1</small>
+          <h4>Feature request intelligence</h4>
+          <p>Ask Glean to synthesize customer asks and recurring friction from support cases, sales notes, docs, and internal discussion.</p>
+        </div>
+        <div class="flow-step">
+          <small>Use case 2</small>
+          <h4>Roadmap and PRD acceleration</h4>
+          <p>Generate a first-cut problem statement, historical context, prior decision trail, and source-backed draft for new initiatives.</p>
+        </div>
+        <div class="flow-step">
+          <small>Use case 3</small>
+          <h4>Launch and PMM alignment</h4>
+          <p>Turn the same product context into sharper messaging, internal enablement, competitive positioning, and launch planning.</p>
+        </div>
+        <div class="flow-step">
+          <small>Result</small>
+          <h4>Faster, better-informed execution</h4>
+          <p>Less time gathering context. More time making the right calls and shipping work that reflects the full customer and internal picture.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="models">
+      <div class="section-head reveal">
+        <div>
+          <h2>Model-agnostic by design</h2>
+          <p>Glean does not force a rip-and-replace of Anthropic or ChatGPT. It makes them more useful inside an enterprise setting.</p>
+        </div>
+      </div>
+
+      <div class="callout reveal d1">
+        <strong>Keep the models. Add the missing enterprise layer.</strong>
+        <p>Glean can work with Anthropic, OpenAI, Gemini, and other leading models while grounding outputs in NinjaOne’s actual company context, permissions, and systems.</p>
+      </div>
+
+      <div style="height:16px"></div>
+
+      <div class="grid-3">
+        <article class="card reveal d2">
+          <div class="icon">◉</div>
+          <h3>Work with Claude and ChatGPT</h3>
+          <p>Use Glean as the retrieval, permissions, and governance layer underneath existing model investments so responses are grounded in enterprise reality.</p>
+        </article>
+        <article class="card reveal d3">
+          <div class="icon">◎</div>
+          <h3>Or standardize on Glean as the front door</h3>
+          <p>Give employees one place to search, ask, automate, and act while still preserving flexibility over which model powers a given workflow.</p>
+        </article>
+        <article class="card reveal d4">
+          <div class="icon">⬡</div>
+          <h3>Stay flexible as the model market shifts</h3>
+          <p>The durable asset is not one model. It is the governed enterprise context layer that makes any model enterprise-ready.</p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head reveal">
+        <div>
+          <h2>How the architecture works</h2>
+          <p>The point is simple: models reason better when they’re fed the right internal context, under the right controls.</p>
+        </div>
+      </div>
+
+      <div class="flow reveal d1">
+        <div class="flow-step">
+          <small>Step 1</small>
+          <h4>NinjaOne systems</h4>
+          <p>Docs, chat, tickets, CRM, engineering tools, knowledge bases, and internal people/context signals.</p>
+        </div>
+        <div class="flow-step">
+          <small>Step 2</small>
+          <h4>Glean context layer</h4>
+          <p>Unified index, permissions-aware retrieval, entity understanding, and reusable workflows.</p>
+        </div>
+        <div class="flow-step">
+          <small>Step 3</small>
+          <h4>Best-fit models</h4>
+          <p>Anthropic, ChatGPT, Gemini, or other leading models selected for the task and governed centrally.</p>
+        </div>
+        <div class="flow-step">
+          <small>Step 4</small>
+          <h4>Trusted outcomes</h4>
+          <p>Better answers, cleaner workflows, safer AI adoption, and less internal friction at scale.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="build-buy">
+      <div class="section-head reveal">
+        <div>
+          <h2>Why teams buy Glean instead of building it all themselves</h2>
+          <p>The real build-vs-buy question is usually not model access. It is whether you want to own the hard, ongoing enterprise plumbing around context and governance.</p>
+        </div>
+      </div>
+
+      <div class="compare reveal d1">
+        <table>
+          <thead>
+            <tr>
+              <th>Dimension</th>
+              <th>Build internally</th>
+              <th>Glean</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Context layer</strong></td>
+              <td>Needs custom connectors, indexing, ranking, permissions replication, and ongoing maintenance.</td>
+              <td class="good">Comes with a mature enterprise knowledge layer across connected systems.</td>
+            </tr>
+            <tr>
+              <td><strong>Governance</strong></td>
+              <td>Requires bespoke controls for permissions, auditability, oversight, and rollout standards.</td>
+              <td class="good">Built around enterprise permissions, centralized controls, and safer adoption patterns.</td>
+            </tr>
+            <tr>
+              <td><strong>Time to value</strong></td>
+              <td>Fast to prototype. Slow to harden, scale, and operationalize across the business.</td>
+              <td class="good">Faster path to production value across functions, not just in isolated pilots.</td>
+            </tr>
+            <tr>
+              <td><strong>Engineering focus</strong></td>
+              <td>Internal teams spend cycles on non-differentiated retrieval and AI plumbing.</td>
+              <td class="good">Lets NinjaOne focus scarce engineering talent on customer-facing AI and product innovation.</td>
+            </tr>
+            <tr>
+              <td><strong>Reusability</strong></td>
+              <td>Often turns into isolated team workflows or person-specific implementations.</td>
+              <td class="good">Enables shared, governed workflows that can scale across teams.</td>
+            </tr>
+            <tr>
+              <td><strong>Model flexibility</strong></td>
+              <td>Varies by architecture and often drifts toward point-solution lock-in.</td>
+              <td class="good">Designed to stay flexible as model preferences and economics evolve.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head reveal">
+        <div>
+          <h2>Key proof points to anchor discussion</h2>
+          <p>If Peter spends five minutes here, these are the takeaways he should leave with.</p>
+        </div>
+      </div>
+
+      <div class="accordion reveal d1">
+        <div class="acc-item open">
+          <button class="acc-btn" type="button">
+            <span>Glean is not just another model UI.</span>
+            <span>+</span>
+          </button>
+          <div class="acc-content">
+            Glean’s value is the enterprise context layer: retrieval, permissions, governance, workflow reuse, and a shared company memory that sits underneath model interactions.
+          </div>
+        </div>
+
+        <div class="acc-item">
+          <button class="acc-btn" type="button">
+            <span>NinjaOne can keep its existing model relationships.</span>
+            <span>+</span>
+          </button>
+          <div class="acc-content">
+            Glean complements Anthropic and ChatGPT by making enterprise answers more grounded, reusable, and governable. This is a layer decision more than a model decision.
+          </div>
+        </div>
+
+        <div class="acc-item">
+          <button class="acc-btn" type="button">
+            <span>The product team has immediate, tangible use cases.</span>
+            <span>+</span>
+          </button>
+          <div class="acc-content">
+            Product strategy, PM, PMM, and R&amp;D can use Glean to synthesize customer feedback, draft briefs, recall historical decisions, align launches, and cut time wasted on context gathering.
+          </div>
+        </div>
+
+        <div class="acc-item">
+          <button class="acc-btn" type="button">
+            <span>The hard part of AI at enterprise scale is governance.</span>
+            <span>+</span>
+          </button>
+          <div class="acc-content">
+            What looks simple in early experiments often becomes difficult at scale: permissions, auditability, consistency, oversight, and safe reuse across teams. That is where Glean has invested deeply.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="callout reveal d1">
+        <strong>Bottom line for NinjaOne</strong>
+        <p>Glean can help NinjaOne move from “we have access to great models” to “we have an enterprise-ready AI operating layer” — one that improves product velocity, strengthens governance, and turns scattered company context into a durable advantage.</p>
+      </div>
+    </section>
+
+    <div class="footer">Built as a tailored overview for NinjaOne product strategy leadership.</div>
+  </main>
+
+  <script>
+    (function () {
+      var tabButtons = document.querySelectorAll('.tab-btn');
+      var tabPanels = document.querySelectorAll('.tab-panel');
+
+      function activateTab(button) {
+        var target = button.getAttribute('data-tab');
+        tabButtons.forEach(function (btn) {
+          btn.classList.remove('active');
+          btn.setAttribute('aria-selected', 'false');
+        });
+        tabPanels.forEach(function (panel) {
+          panel.classList.remove('active');
+        });
+        button.classList.add('active');
+        button.setAttribute('aria-selected', 'true');
+        var panel = document.getElementById(target);
+        if (panel) panel.classList.add('active');
+      }
+
+      tabButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          activateTab(button);
+        });
+      });
+
+      document.querySelectorAll('.acc-item').forEach(function (item) {
+        var btn = item.querySelector('.acc-btn');
+        btn.addEventListener('click', function () {
+          item.classList.toggle('open');
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
